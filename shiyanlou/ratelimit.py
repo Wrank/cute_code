@@ -19,7 +19,11 @@ class RateLimiter(object):
             with self:
                 if not self.exceed:
                     return f(*args, **kwargs)
+                if self.callback is not None:
+                    self.callback(self.period)
+                    return f(*args, **kwargs)
                 raise Exception("rate exceed")
+
         return wrapped
 
     def __enter__(self):
@@ -29,7 +33,7 @@ class RateLimiter(object):
                 return self
             else:
                 raise Exception("rate exceed")
-        
+
         return self
 
     @property
